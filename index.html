@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Video İndirici</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, #fe2c55 0%, #25f4ee 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content Styles */
+        main {
+            padding: 30px 20px;
+        }
+
+        .download-form {
+            display: flex;
+            margin-bottom: 30px;
+        }
+
+        #video-url {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 5px 0 0 5px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #video-url:focus {
+            border-color: #fe2c55;
+        }
+
+        #download-btn {
+            background-color: #fe2c55;
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 5px 5px 0;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #download-btn:hover {
+            background-color: #e6254e;
+        }
+
+        /* Result Section */
+        #result {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .video-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #video-container {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #video-container img, 
+        #video-container video {
+            width: 100%;
+            display: block;
+        }
+
+        .download-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .download-option {
+            background-color: #25f4ee;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .download-option:hover {
+            background-color: #20dbd6;
+            transform: translateY(-2px);
+        }
+
+        #download-no-watermark {
+            background-color: #fe2c55;
+        }
+
+        #download-no-watermark:hover {
+            background-color: #e6254e;
+        }
+
+        /* Loading Animation */
+        #loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fe2c55;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error Message */
+        #error {
+            background-color: #fff5f5;
+            border: 1px solid #ffebeb;
+            border-radius: 5px;
+            padding: 15px;
+            display: none;
+            align-items: center;
+            color: #e53e3e;
+        }
+
+        #error i {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            .download-form {
+                flex-direction: column;
+            }
+            
+            #video-url {
+                border-radius: 5px 5px 0 0;
+            }
+            
+            #download-btn {
+                border-radius: 0 0 5px 5px;
+                padding: 12px;
+            }
+            
+            .download-options {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .download-option {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-tiktok"></i> TikTok Video İndirici</h1>
+            <p>TikTok videolarını kolayca indirin!</p>
+        </header>
+        
+        <main>
+            <div class="download-form">
+                <input type="text" id="video-url" placeholder="TikTok video URL'sini yapıştırın" required>
+                <button id="download-btn">İndir</button>
+            </div>
+            
+            <div id="result">
+                <div class="video-preview">
+                    <div id="video-container"></div>
+                    <div class="download-options">
+                        <a id="download-no-watermark" class="download-option" href="#" target="_blank">
+                            <i class="fas fa-download"></i> İndir
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="loading">
+                <div class="spinner"></div>
+                <p>Video işleniyor...</p>
+            </div>
+            
+            <div id="error">
+                <i class="fas fa-exclamation-circle"></i>
+                <p id="error-message"></p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 TikTok Video İndirici. Tüm hakları saklıdır.</p>
+        </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoUrlInput = document.getElementById('video-url');
+            const downloadBtn = document.getElementById('download-btn');
+            const resultSection = document.getElementById('result');
+            const loadingSection = document.getElementById('loading');
+            const errorSection = document.getElementById('error');
+            const errorMessage = document.getElementById('error-message');
+            const videoContainer = document.getElementById('video-container');
+            const downloadNoWatermark = document.getElementById('download-no-watermark');
+
+            // Function to validate TikTok URL
+            function isValidTikTokUrl(url) {
+                return url.includes('tiktok.com');
+            }
+
+            // Function to show error
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorSection.style.display = 'flex';
+                loadingSection.style.display = 'none';
+                resultSection.style.display = 'none';
+            }
+
+            // Function to reset UI
+            function resetUI() {
+                errorSection.style.display = 'none';
+                loadingSection.style.display = 'none';
+                resultSection.style.display = 'none';
+            }
+
+            // Handle download button click
+            downloadBtn.addEventListener('click', async () => {
+                const videoUrl = videoUrlInput.value.trim();
+                
+                // Validate URL
+                if (!videoUrl) {
+                    showError('Lütfen bir TikTok video URL\'si girin.');
+                    return;
+                }
+                
+                if (!isValidTikTokUrl(videoUrl)) {
+                    showError('Geçerli bir TikTok URL\'si girin.');
+                    return;
+                }
+                
+                // Reset UI and show loading
+                resetUI();
+                loadingSection.style.display = 'flex';
+                
+                try {
+                    // Use the public TikTok downloader API
+                    const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(videoUrl)}`;
+                    
+                    const response = await fetch(apiUrl);
+                    
+                    if (!response.ok) {
+                        throw new Error('Video indirme işlemi başarısız oldu.');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.code !== 0) {
+                        throw new Error(data.msg || 'Video işlenirken bir hata oluştu.');
+                    }
+                    
+                    // Hide loading and show result
+                    loadingSection.style.display = 'none';
+                    resultSection.style.display = 'block';
+                    
+                    // Display video preview
+                    const videoData = data.data;
+                    
+                    videoContainer.innerHTML = `
+                        <video controls>
+                            <source src="${videoData.play}" type="video/mp4">
+                            Tarayıcınız video etiketini desteklemiyor.
+                        </video>
+                    `;
+                    
+                    // Set download link
+                    downloadNoWatermark.href = videoData.play;
+                    downloadNoWatermark.setAttribute('download', 'tiktok_video.mp4');
+                    
+                } catch (error) {
+                    showError(error.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            });
+
+            // Clear error when input changes
+            videoUrlInput.addEventListener('input', () => {
+                errorSection.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
